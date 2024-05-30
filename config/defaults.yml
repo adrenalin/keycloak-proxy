@@ -6,6 +6,7 @@ keycloak:
 
 proxy:
   host: 'http://localhost:3100'
+  status_code: 307
 
 server:
   port: 3100

@@ -116,7 +116,7 @@ const init = async () => {
       return
     }
 
-    res.status(202)
+    res.status(config.get('proxy.status_code', 307))
     res.send('OK\n')
   })
 
