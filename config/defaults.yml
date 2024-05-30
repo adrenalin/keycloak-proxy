@@ -1,0 +1,9 @@
+keycloak:
+  client_id: 'CLIENT_ID'
+  client_secret: 'CLIENT_SECRET'
+  issuer: 'https://example.com/'
+  realm: 'REALM_NAME'
+
+server:
+  port: 3000
+  session_id: 'keycloak-proxy'
