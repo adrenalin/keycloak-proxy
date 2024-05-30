@@ -4,6 +4,9 @@ keycloak:
   issuer: 'https://example.com/'
   realm: 'REALM_NAME'
 
+proxy:
+  host: 'http://localhost:3100'
+
 server:
-  port: 3000
+  port: 3100
   session_id: 'keycloak-proxy'

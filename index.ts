@@ -34,35 +34,14 @@ const init = async () => {
     res.redirect('/test')
   }
 
-  const logout = (req: Request) => {
-    return new Promise((resolve, reject) => {
-      req.logOut((err: any) => {
-        if (err) {
-          return reject(err)
-        }
-
-        req.session.destroy((err) => {
-          if (err) {
-            console.error('Failed to destroy session')
-            console.error(err)
-            console.error(err.stack)
-          }
-        })
-
-        resolve(null)
-      })
-    })
-  }
-
   const client = new issuer.Client({
     client_id: config.get('keycloak.client_id'),
     client_secret: config.get('keycloak.client_secret'),
     redirect_uris: [
-      'http://localhost:3100/auth/login'
+      `${config.get('proxy.host')}/auth/login`
     ],
     post_logout_redirect_uris: [
-      'http://localhost:3100/logout/callback'
-
+      `${config.get('proxy.host')}/logout`
     ],
     response_types: ['code']
   })
@@ -141,8 +120,8 @@ const init = async () => {
     res.send('OK\n')
   })
 
-  app.listen(3100, () => {
-    console.log('listening')
+  app.listen(config.get('server.port'), () => {
+    console.log('Listening to', config.get('server.port'))
   })
 }
 
