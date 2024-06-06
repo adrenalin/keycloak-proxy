@@ -1,5 +1,6 @@
 import path from 'path'
 import express, { Express, Request, Response, NextFunction } from 'express'
+import proxy from 'express-http-proxy'
 import { Issuer, Strategy } from 'openid-client'
 import passport from 'passport'
 import session, { MemoryStore } from 'express-session'
@@ -64,6 +65,8 @@ const init = async () => {
 
   app.use(passport.initialize())
   app.use(passport.authenticate('session'))
+  app.set('trust proxy', true)
+
   passport.use('oidc', new Strategy({ client }, async (tokenSet: any, userInfo: any, done: Function) => {
     return done(null, tokenSet.claims())
   }))
@@ -110,14 +113,53 @@ const init = async () => {
   })
 
   app.use((req: Request, res: Response, next: NextFunction) => {
+    console.log('req.ip', req.ip)
+
+    const whitelisted = config.get('whitelist', [])
+
+    for (const ip of whitelisted) {
+      if (ip === req.ip) {
+        console.log('ip', req.ip, 'is whitelisted', ip)
+        return next()
+      }
+    }
+
     if (!req.isAuthenticated()) {
       req.session.redirectUrl = req.originalUrl
       res.redirect('/auth/login')
       return
     }
+  })
 
-    res.status(config.get('proxy.status_code', 307))
-    res.send('OK\n')
+  const isPatternMatch = (pattern: string, url: string): Boolean => {
+    if (pattern === '*') {
+      console.log('wildcard match')
+      return true
+    }
+
+    const regexp = new RegExp(pattern.replace(/\//, '\\/'))
+
+    return regexp.test(url)
+  }
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const forwards: Record<string, string> = config.get('forwards', {})
+
+    for (const pattern in forwards) {
+      if (!isPatternMatch(pattern, req.originalUrl)) {
+        console.log('-- no match', pattern, req.originalUrl)
+        continue
+      }
+
+      const location = forwards[pattern] + req.originalUrl
+
+      console.log('-- proxy request', req.originalUrl, 'to', location)
+      proxy(location)(req, res, next)
+      return
+    }
+
+    res.statusCode = 500
+    res.send('Proxy failed to match the authenticated request\n')
   })
 
   app.listen(config.get('server.port'), () => {

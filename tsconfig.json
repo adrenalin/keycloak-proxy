@@ -14,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "nodenext",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "isolatedModules": true,
     "resolveJsonModule": true,
     "noEmit": true,
@@ -36,9 +36,6 @@
     }
   },
   "include": [
-    "src",
-    "lib",
-    ".eslintrc.js",
-    "test/**/*.ts"
+    "index.ts"
   ]
 }

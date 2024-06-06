@@ -11,3 +11,6 @@ proxy:
 server:
   port: 3100
   session_id: 'keycloak-proxy'
+
+whitelist: []
+forwards: {}
