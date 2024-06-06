@@ -86,6 +86,7 @@ const init = async () => {
         return
       }
 
+      req.session.destroy((err) => {})
       res.send('Logged out\n')
     })
   })
@@ -93,13 +94,16 @@ const init = async () => {
   app.get('/auth/login', (req: Request, res: Response, next: NextFunction) => {
 
     if (req.isAuthenticated()) {
+      console.log('-- is authenticated')
       if (req.session.redirectUrl) {
+        console.log('-- has redirectUrl', req.session.redirectUrl)
         res.redirect(req.session.redirectUrl)
         req.session.redirectUrl = undefined
         return
       }
 
-      return next()
+      console.log('-- no redirect url')
+      return res.redirect('/')
     }
 
     passport.authenticate('oidc', {
@@ -113,7 +117,7 @@ const init = async () => {
   })
 
   app.use((req: Request, res: Response, next: NextFunction) => {
-    console.log('req.ip', req.ip)
+    console.log('req.ip', req.ip, req.originalUrl)
 
     const whitelisted = config.get('whitelist', [])
 
@@ -129,6 +133,8 @@ const init = async () => {
       res.redirect('/auth/login')
       return
     }
+
+    return next()
   })
 
   const isPatternMatch = (pattern: string, url: string): Boolean => {
