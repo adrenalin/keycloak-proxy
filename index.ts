@@ -163,7 +163,7 @@ const init = async () => {
       return
     }
 
-    res.statusCode = 500
+    res.statusCode = config.get('proxy.status_code', 503)
     res.send('Proxy failed to match the authenticated request\n')
   })
 
