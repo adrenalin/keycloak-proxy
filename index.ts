@@ -143,7 +143,7 @@ const init = async () => {
       return true
     }
 
-    const regexp = new RegExp(pattern.replace(/\//, '\\/'))
+    const regexp = new RegExp('^' + pattern.replace(/\//, '\\/'))
 
     return regexp.test(url)
   }
