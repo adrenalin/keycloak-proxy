@@ -127,10 +127,10 @@ const init = async () => {
       }
     }
 
-    console.log('url', `${req.protocol}://${req.hostname}${req.originalUrl}`)
+    const host = config.get('proxy.host', `${req.protocol}://${req.hostname}`)
 
     if (!req.isAuthenticated()) {
-      req.session.redirectUrl = `${req.protocol}://${req.hostname}${req.originalUrl}`
+      req.session.redirectUrl = `${host}${req.originalUrl}`
       res.redirect(`${req.protocol}://${req.hostname}/auth/login`)
       return
     }
