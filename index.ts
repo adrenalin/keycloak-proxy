@@ -92,7 +92,6 @@ const init = async () => {
   })
 
   app.get('/auth/login', (req: Request, res: Response, next: NextFunction) => {
-
     if (req.isAuthenticated()) {
       console.log('-- is authenticated')
       if (req.session.redirectUrl) {
@@ -107,7 +106,7 @@ const init = async () => {
     }
 
     passport.authenticate('oidc', {
-      successRedirect: '/auth/login',
+      successRedirect: `${config.get('proxy.host')}/auth/login`,
       keepSessionInfo: true
     })(req, res, next)
   })
@@ -128,8 +127,10 @@ const init = async () => {
       }
     }
 
+    console.log('url', `${req.protocol}://${req.hostname}${req.originalUrl}`)
+
     if (!req.isAuthenticated()) {
-      req.session.redirectUrl = req.originalUrl
+      req.session.redirectUrl = `${req.protocol}://${req.hostname}${req.originalUrl}`
       res.redirect('/auth/login')
       return
     }
