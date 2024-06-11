@@ -139,7 +139,6 @@ const init = async () => {
 
   const isPatternMatch = (pattern: string, url: string): Boolean => {
     if (pattern === '*') {
-      console.log('wildcard match')
       return true
     }
 
@@ -159,7 +158,7 @@ const init = async () => {
 
       const location = forwards[pattern] + req.originalUrl
 
-      console.log('-- proxy request', req.originalUrl, 'to', location)
+      console.log('-- proxy request', req.ip, req.originalUrl, 'to', location)
       proxy(location)(req, res, next)
       return
     }
