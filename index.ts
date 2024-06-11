@@ -131,7 +131,7 @@ const init = async () => {
 
     if (!req.isAuthenticated()) {
       req.session.redirectUrl = `${req.protocol}://${req.hostname}${req.originalUrl}`
-      res.redirect('/auth/login')
+      res.redirect(`${req.protocol}://${req.hostname}/auth/login`)
       return
     }
 
