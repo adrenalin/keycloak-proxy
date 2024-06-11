@@ -148,12 +148,20 @@ const init = async () => {
   }
 
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const forwards: Record<string, string> = config.get('forwards', {})
+    const forwards: Record<string, number | string> = config.get('forwards', {})
+    res.statusCode = config.get('proxy.status_code', 503)
 
     for (const pattern in forwards) {
       if (!isPatternMatch(pattern, req.originalUrl)) {
         console.log('-- no match', pattern, req.originalUrl)
         continue
+      }
+
+      if (typeof forwards[pattern] === 'number') {
+        console.log('-- proxy request', req.ip, req.originalUrl, 'as a status code', forwards[pattern])
+        res.statusCode = forwards[pattern] as number
+        res.send('ok\n')
+        return
       }
 
       const location = forwards[pattern] + req.originalUrl
@@ -163,7 +171,6 @@ const init = async () => {
       return
     }
 
-    res.statusCode = config.get('proxy.status_code', 503)
     res.send('Proxy failed to match the authenticated request\n')
   })
 
